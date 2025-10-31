@@ -93,23 +93,4 @@ public class AdminBackupController {
         }
     }
 
-    @PostMapping("/create-init-zip")
-    public ApiResponse<String> createInitialDataZip() {
-        try {
-            String filename = backupService.createInitialDataZip();
-            return ApiResponse.success("Initial data zip created successfully", filename);
-        } catch (Exception e) {
-            return ApiResponse.error("Failed to create initial data zip: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/import-init-data")
-    public ApiResponse<String> importInitialData(@RequestParam("file") MultipartFile file) {
-        try {
-            backupService.importInitialData(file);
-            return ApiResponse.success("Initial data imported successfully");
-        } catch (Exception e) {
-            return ApiResponse.error("Failed to import initial data: " + e.getMessage());
-        }
-    }
 }

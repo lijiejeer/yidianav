@@ -1,169 +1,137 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" id="top">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>网址导航 - 实用的资源导航综合网站</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="shortcut icon" href="/web_tool-master/assets/images/favicon.png">
+    <link rel="stylesheet" href="/web_tool-master/assets/css/block-library.min-5.6.2.css">
+    <link rel="stylesheet" href="/web_tool-master/assets/css/iconfont-3.03029.1.css">
+    <link rel="stylesheet" href="/web_tool-master/assets/css/bootstrap.min-4.3.1.css">
+    <link rel="stylesheet" href="/web_tool-master/assets/css/fancybox.min-3.5.7.css">
+    <link rel="stylesheet" href="/web_tool-master/assets/css/style-3.03029.1.css">
+    <link rel="stylesheet" href="/web_tool-master/assets/css/custom-style.css">
+    <link rel="stylesheet" href="/web_tool-master/assets/fontawesome-5.15.4/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
-            --card-bg: rgba(255, 255, 255, 0.9);
-            --hover-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        }
-
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
         }
 
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        .sidebar-menu-inner ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 0;
         }
 
-        .navbar {
-            background: rgba(255, 255, 255, 0.95) !important;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .search-container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 15px;
-        }
-
-        .search-box {
-            position: relative;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 15px 120px 15px 20px;
-            border-radius: 50px;
-            border: none;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            font-size: 16px;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .search-btn {
-            position: absolute;
-            right: 5px;
-            top: 5px;
-            padding: 10px 30px;
-            border-radius: 50px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        .search-engines {
+        .sidebar-menu-inner li.sidebar-item a {
             display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 15px;
-            flex-wrap: wrap;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.85);
+            transition: all .2s ease;
         }
 
-        .search-engines label {
-            color: white;
-            font-size: 14px;
-            cursor: pointer;
-            padding: 5px 15px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            transition: all 0.3s;
+        .sidebar-menu-inner li.sidebar-item a:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+            text-decoration: none;
         }
 
-        .search-engines input[type="radio"]:checked + label {
-            background: rgba(255, 255, 255, 0.4);
-            font-weight: bold;
+        .sidebar-menu-inner li.sidebar-item a span[data-depth] {
+            padding-left: var(--depth-padding, 0px);
+            flex: 1;
         }
 
-        .search-engines input[type="radio"] {
-            display: none;
+        #categoriesContainer section + section {
+            margin-top: 3rem;
         }
 
-        .category-section {
-            margin: 3rem 0;
+        .section-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
         }
 
-        .category-title {
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.2);
+        .section-heading h4 {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            color: #5f646d;
+        }
+
+        .section-heading h4 i {
+            margin-right: 10px;
+        }
+
+        .url-card .url-img img {
+            max-width: 40px;
+            max-height: 40px;
             border-radius: 10px;
-            display: inline-flex;
+        }
+
+        .url-card .url-img .fallback-icon {
+            font-size: 24px;
+            color: #6c63ff;
+        }
+
+        .search-info-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.75);
+            margin-top: 10px;
+        }
+
+        .search-result-actions {
+            display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .nav-card {
-            background: var(--card-bg);
+        .empty-state {
+            padding: 80px 20px;
+            text-align: center;
+            color: #6c757d;
+            background: rgba(255, 255, 255, 0.85);
             border-radius: 15px;
-            padding: 20px;
-            transition: all 0.3s;
-            cursor: pointer;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            text-decoration: none;
-            color: inherit;
-            display: block;
         }
 
-        .nav-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--hover-shadow);
-            text-decoration: none;
+        .empty-state i {
+            font-size: 32px;
+            color: #6c63ff;
+            margin-bottom: 12px;
         }
 
-        .nav-card .icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 10px;
-            display: flex;
+        .friendlink.card {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 15px 45px -20px rgba(92, 99, 244, 0.35);
+        }
+
+        .friendlink.card .card-body a {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            font-size: 24px;
-            margin-bottom: 15px;
+            padding: 6px 14px;
+            border-radius: 16px;
+            background: rgba(92, 99, 244, 0.08);
+            color: #4a4f5a;
+            font-size: 13px;
+            margin: 4px 6px;
+            transition: all .2s ease;
         }
 
-        .nav-card h5 {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #333;
+        .friendlink.card .card-body a:hover {
+            background: rgba(92, 99, 244, 0.16);
+            color: #5c63f4;
+            text-decoration: none;
         }
 
-        .nav-card p {
-            font-size: 14px;
-            color: #666;
-            margin: 0;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+        .notification-banner {
+            margin-bottom: 1.5rem;
+        }
+
+        .notification-banner .alert {
+            border-radius: 18px;
+            box-shadow: 0 15px 35px -15px rgba(92, 99, 244, 0.45);
         }
 
         .floating-ad {
@@ -183,153 +151,206 @@
         }
 
         .ad-content {
-            background: white;
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
             padding: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
             position: relative;
         }
 
         .ad-close {
             position: absolute;
-            top: 5px;
-            right: 5px;
-            background: #ff4444;
-            color: white;
+            top: 6px;
+            right: 6px;
+            width: 22px;
+            height: 22px;
             border: none;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            background: #ff5c5c;
+            color: #fff;
             font-size: 12px;
-            cursor: pointer;
             line-height: 1;
+            cursor: pointer;
         }
 
         .ad-content img {
             width: 100%;
-            border-radius: 5px;
+            border-radius: 8px;
         }
 
-        .friend-links {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 15px;
-            margin: 3rem 0;
-        }
-
-        .friend-links h3 {
-            color: white;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .friend-links-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        .friend-link {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px 20px;
-            border-radius: 25px;
-            color: #333;
-            text-decoration: none;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-
-        .friend-link:hover {
-            background: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            text-decoration: none;
-        }
-
-        footer {
-            background: rgba(0, 0, 0, 0.2);
-            color: white;
-            text-align: center;
-            padding: 20px;
-            margin-top: 50px;
-        }
-
-        @media (max-width: 768px) {
-            .card-grid {
-                grid-template-columns: 1fr;
-            }
-
+        @media (max-width: 1200px) {
             .floating-ad {
-                display: none;
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .page-container {
+                flex-direction: column;
             }
 
-            .search-box input {
-                padding: 12px 100px 12px 15px;
-            }
-
-            .search-btn {
-                padding: 8px 20px;
+            #sidebar {
+                width: 100% !important;
+                position: relative;
             }
         }
     </style>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container">
-            <a class="navbar-brand font-weight-bold" href="/">
-                <i class="fas fa-compass"></i> 网址导航
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#home">首页</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#links">友情链接</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin">管理后台</a>
-                    </li>
-                </ul>
+<body class="io-grey-mode">
+    <div class="page-container d-flex">
+        <div id="sidebar" class="sticky sidebar-nav fade animate-nav" style="width: 200px;">
+            <div class="modal-dialog h-100 sidebar-nav-inner">
+                <div class="sidebar-logo border-bottom border-color">
+                    <div class="logo overflow-hidden">
+                        <a href="/" class="logo-expanded">
+                            <img src="/web_tool-master/assets/images/bt8-expand-light.png" height="40" class="logo-light" alt="网址导航">
+                            <img src="/web_tool-master/assets/images/bt8-expand-dark.png" height="40" class="logo-dark d-none" alt="网址导航">
+                        </a>
+                        <a href="/" class="logo-collapsed">
+                            <img src="/web_tool-master/assets/images/bt.png" height="40" class="logo-light" alt="网址导航">
+                            <img src="/web_tool-master/assets/images/bt.png" height="40" class="logo-dark d-none" alt="网址导航">
+                        </a>
+                    </div>
+                </div>
+                <div class="sidebar-menu flex-fill">
+                    <div class="sidebar-scroll">
+                        <div class="sidebar-menu-inner">
+                            <ul id="sidebarMenu"></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-top py-2 border-color">
+                    <div class="flex-bottom">
+                        <ul>
+                            <li class="sidebar-item">
+                                <a href="#friendLinksSection" class="smooth">
+                                    <i class="fab fa-staylinked icon-fw icon-lg mr-2"></i>
+                                    <span>友情链接</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a href="/admin" target="_blank">
+                                    <i class="fas fa-user-cog icon-fw icon-lg mr-2"></i>
+                                    <span>管理后台</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
-    </nav>
-
-    <div class="container">
-        <div class="search-container">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="搜索你想要的内容...">
-                <button class="search-btn" onclick="performSearch()">
-                    <i class="fas fa-search"></i> 搜索
-                </button>
+        <div class="main-content flex-fill grid-bg">
+            <div class="big-header-banner">
+                <div id="header" class="page-header sticky">
+                    <div class="navbar navbar-expand-md">
+                        <div class="container-fluid p-0">
+                            <a href="/" class="navbar-brand d-md-none" title="网址导航">
+                                <img src="/web_tool-master/assets/images/bt.png" class="logo-light" alt="网址导航">
+                                <img src="/web_tool-master/assets/images/bt.png" class="logo-dark d-none" alt="网址导航">
+                            </a>
+                            <div class="collapse navbar-collapse order-2 order-md-1">
+                                <div class="header-mini-btn">
+                                    <label>
+                                        <input id="mini-button" type="checkbox">
+                                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                            <path class="line--1" d="M0 40h62c18 0 18-20-17 5L31 55"></path>
+                                            <path class="line--2" d="M0 50h80"></path>
+                                            <path class="line--3" d="M0 60h62c18 0 18 20-17-5L31 45"></path>
+                                        </svg>
+                                    </label>
+                                </div>
+                                <ul class="navbar-nav site-menu" style="margin-right: 16px;">
+                                    <li>
+                                        <a href="#top">
+                                            <i class="fa fa-home fa-lg mr-2"></i>
+                                            <span>首页</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#friendLinksSection">
+                                            <i class="fa fa-book fa-lg mr-2"></i>
+                                            <span>友情链接</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="rounded-circle weather d-none d-lg-flex align-items-center">
+                                    <div id="he-plugin-simple" style="display: contents;"></div>
+                                </div>
+                            </div>
+                            <ul class="nav navbar-menu text-xs order-1 order-md-2">
+                                <li class="nav-item mr-3 mr-lg-0 d-none d-lg-block">
+                                    <div id="hitokoto"><a href="#" target="_blank" id="hitokoto_text">加载中...</a></div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="placeholder" style="height:74px"></div>
             </div>
-            <div class="search-engines">
-                <input type="radio" name="search-engine" id="google" value="google">
-                <label for="google"><i class="fab fa-google"></i> Google</label>
-                
-                <input type="radio" name="search-engine" id="baidu" value="baidu" checked>
-                <label for="baidu">百度</label>
-                
-                <input type="radio" name="search-engine" id="bing" value="bing">
-                <label for="bing"><i class="fab fa-microsoft"></i> Bing</label>
-                
-                <input type="radio" name="search-engine" id="github" value="github">
-                <label for="github"><i class="fab fa-github"></i> GitHub</label>
-                
-                <input type="radio" name="search-engine" id="local" value="local">
-                <label for="local"><i class="fas fa-home"></i> 站内</label>
+
+            <div class="header-big post-top css-color mb-4" id="search-bg">
+                <div class="s-search">
+                    <div id="search" class="s-search mx-auto">
+                        <form id="searchForm" class="super-search-fm">
+                            <input type="text" id="search-text" class="form-control smart-tips search-key" autocomplete="off" placeholder="输入关键字搜索">
+                            <button class="submit" type="submit"><i class="iconfont icon-search"></i></button>
+                        </form>
+                        <div class="search-group group-a mt-3">
+                            <ul class="search-type" id="searchEngineList">
+                                <li>
+                                    <input type="radio" name="search-engine" id="engine-baidu" value="https://www.baidu.com/s?wd=" data-placeholder="百度一下，你就知道" hidden checked>
+                                    <label for="engine-baidu"><span class="text-muted">百度</span></label>
+                                </li>
+                                <li>
+                                    <input type="radio" name="search-engine" id="engine-bing" value="https://cn.bing.com/search?q=" data-placeholder="微软 Bing 搜索" hidden>
+                                    <label for="engine-bing"><span class="text-muted">必应</span></label>
+                                </li>
+                                <li>
+                                    <input type="radio" name="search-engine" id="engine-google" value="https://www.google.com/search?q=" data-placeholder="谷歌搜索" hidden>
+                                    <label for="engine-google"><span class="text-muted">谷歌</span></label>
+                                </li>
+                                <li>
+                                    <input type="radio" name="search-engine" id="engine-github" value="https://github.com/search?q=" data-placeholder="GitHub 搜索" hidden>
+                                    <label for="engine-github"><span class="text-muted">GitHub</span></label>
+                                </li>
+                                <li>
+                                    <input type="radio" name="search-engine" id="engine-local" value="local" data-placeholder="站内导航搜索" hidden>
+                                    <label for="engine-local"><span class="text-muted">站内</span></label>
+                                </li>
+                            </ul>
+                            <div class="search-info-text">支持多引擎检索，选择“站内”可快速定位到本站收藏的资源。</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div id="categoriesContainer"></div>
-
-        <div class="friend-links" id="links">
-            <h3><i class="fas fa-link"></i> 友情链接</h3>
-            <div class="friend-links-grid" id="friendLinksContainer"></div>
+            <div class="container-fluid px-md-4 pb-5">
+                <div id="notificationBanner" class="notification-banner"></div>
+                <div id="categoriesContainer">
+                    <div class="empty-state" id="categoriesLoading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <div class="mt-2">正在加载导航内容，请稍候...</div>
+                    </div>
+                </div>
+                <section id="friendLinksSection" class="mt-5">
+                    <h4 class="text-gray text-lg mb-4">
+                        <i class="iconfont icon-book-mark-line icon-lg mr-2"></i>友情链接
+                    </h4>
+                    <div class="friendlink text-xs card">
+                        <div class="card-body d-flex flex-wrap" id="friendLinksContainer">
+                            <span class="text-muted">正在加载友链...</span>
+                        </div>
+                    </div>
+                </section>
+                <footer class="main-footer footer-type-1 text-xs mt-5">
+                    <div class="footer-inner">
+                        <div class="footer-text text-center">
+                            本站内容源自互联网，如有侵权请联系删除。<br>
+                            &copy; 2024 网址导航 · 构建精选高效的上网入口
+                        </div>
+                    </div>
+                </footer>
+            </div>
         </div>
     </div>
 
@@ -347,184 +368,558 @@
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2024 网址导航. All rights reserved.</p>
-    </footer>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/web_tool-master/assets/js/jquery.min-3.2.1.js"></script>
+    <script src="/web_tool-master/assets/js/popper.min.js"></script>
+    <script src="/web_tool-master/assets/js/bootstrap.min-4.3.1.js"></script>
     <script>
-        function loadCategories() {
-            fetch('/api/public/categories')
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success) {
-                        displayCategories(result.data);
-                    }
+        const API_BASE = '/api';
+        let categoryCardsMap = new Map();
+        let categoryNameMap = new Map();
+        let availableCategories = [];
+        let dataLoaded = false;
+        let showingSearchResults = false;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initSearch();
+            loadCategories(true);
+            loadFriendLinks();
+            loadAds();
+            loadHitokoto();
+        });
+
+        function initSearch() {
+            const searchInput = document.getElementById('search-text');
+            const updatePlaceholder = () => {
+                const checked = document.querySelector('input[name="search-engine"]:checked');
+                if (checked && searchInput) {
+                    const placeholder = checked.dataset.placeholder || '搜索你想要的内容';
+                    searchInput.setAttribute('placeholder', placeholder);
+                }
+            };
+
+            document.querySelectorAll('input[name="search-engine"]').forEach(radio => {
+                radio.addEventListener('change', updatePlaceholder);
+            });
+
+            updatePlaceholder();
+
+            const form = document.getElementById('searchForm');
+            if (form) {
+                form.addEventListener('submit', event => {
+                    event.preventDefault();
+                    performSearch();
                 });
+            }
         }
 
-        function displayCategories(categories) {
+        function createEmptyState(message, iconClass = 'fas fa-info-circle') {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'empty-state';
+            wrapper.innerHTML = `
+                <i class="${iconClass}"></i>
+                <div class="mt-2">${message}</div>
+            `;
+            return wrapper;
+        }
+
+        function setCategoriesLoading() {
             const container = document.getElementById('categoriesContainer');
+            if (!container) {
+                return;
+            }
             container.innerHTML = '';
+            container.appendChild(createEmptyState('正在加载导航内容，请稍候...', 'fas fa-spinner fa-spin'));
+        }
+
+        function renderSidebar(categories) {
+            const sidebarMenu = document.getElementById('sidebarMenu');
+            if (!sidebarMenu) {
+                return;
+            }
+            sidebarMenu.innerHTML = '';
+
+            if (!categories.length) {
+                const li = document.createElement('li');
+                li.className = 'sidebar-item text-muted px-3 py-2';
+                li.textContent = '暂无导航';
+                sidebarMenu.appendChild(li);
+                return;
+            }
 
             categories.forEach(category => {
-                const section = document.createElement('div');
-                section.className = 'category-section';
+                const li = document.createElement('li');
+                li.className = 'sidebar-item';
 
-                const title = document.createElement('div');
-                title.className = 'category-title';
-                title.innerHTML = `<i class="${category.icon || 'fas fa-folder'}"></i> ${category.name}`;
-                section.appendChild(title);
+                const anchor = document.createElement('a');
+                const anchorId = category.anchorId || `category-${category.id}`;
+                anchor.href = `#${anchorId}`;
+                anchor.className = 'smooth';
 
-                const cardGrid = document.createElement('div');
-                cardGrid.className = 'card-grid';
+                const iconEl = document.createElement('i');
+                const iconClass = category.icon && category.icon.trim().length ? category.icon : 'far fa-folder-open';
+                iconEl.className = `${iconClass} icon-fw icon-lg mr-2`;
+                anchor.appendChild(iconEl);
 
-                fetch(`/api/public/cards/category/${category.id}`)
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.success && result.data.length > 0) {
-                            result.data.forEach(card => {
-                                const cardElement = document.createElement('a');
-                                cardElement.className = 'nav-card';
-                                cardElement.href = card.url;
-                                cardElement.target = '_blank';
-                                cardElement.innerHTML = `
-                                    <div class="icon">
-                                        ${card.logo ? `<img src="${card.logo}" style="width: 32px; height: 32px; border-radius: 5px;" onerror="this.outerHTML='<i class=\\'fas fa-globe\\'></i>'">` : '<i class="fas fa-globe"></i>'}
-                                    </div>
-                                    <h5>${card.name}</h5>
-                                    <p>${card.description || '暂无描述'}</p>
-                                `;
-                                cardGrid.appendChild(cardElement);
-                            });
-                        }
-                    });
+                const nameSpan = document.createElement('span');
+                nameSpan.dataset.depth = category.level || 0;
+                nameSpan.textContent = category.displayName || category.name;
+                nameSpan.style.setProperty('--depth-padding', `${(category.level || 0) * 16}px`);
+                anchor.appendChild(nameSpan);
 
-                section.appendChild(cardGrid);
-                container.appendChild(section);
+                li.appendChild(anchor);
+                sidebarMenu.appendChild(li);
             });
         }
 
-        function loadFriendLinks() {
-            fetch('/api/public/friendlinks')
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success && result.data.length > 0) {
-                        const container = document.getElementById('friendLinksContainer');
-                        container.innerHTML = '';
-                        result.data.forEach(link => {
-                            const linkElement = document.createElement('a');
-                            linkElement.className = 'friend-link';
-                            linkElement.href = link.url;
-                            linkElement.target = '_blank';
-                            linkElement.textContent = link.name;
-                            container.appendChild(linkElement);
-                        });
-                    }
-                });
+        function createCardElement(card) {
+            const col = document.createElement('div');
+            col.className = 'url-card col-12 col-sm-6 col-md-4 col-xl-5a col-xxl-6a';
+            const hasLogo = card.logo && card.logo.trim().length;
+            const logoHtml = hasLogo
+                ? `<img src="${card.logo}" alt="${card.name}" onerror="this.src='/web_tool-master/assets/images/logos/default.webp'">`
+                : '<i class="fas fa-globe-asia fallback-icon"></i>';
+
+            col.innerHTML = `
+                <div class="url-body default">
+                    <a href="${card.url}" target="_blank" class="card no-c mb-4" rel="noopener">
+                        <div class="card-body">
+                            <div class="url-content d-flex align-items-center">
+                                <div class="url-img mr-2 d-flex align-items-center justify-content-center">
+                                    ${logoHtml}
+                                </div>
+                                <div class="url-info flex-fill">
+                                    <div class="text-sm overflowClip_1"><strong>${card.name}</strong></div>
+                                    <p class="overflowClip_1 m-0 text-muted text-xs">${card.description || '暂无描述'}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            `;
+            return col;
         }
 
-        function loadAds() {
-            fetch('/api/public/ads/left')
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success && result.data.length > 0) {
-                        const ad = result.data[0];
-                        document.getElementById('leftAdContent').innerHTML = `
-                            <a href="${ad.linkUrl}" target="_blank">
-                                <img src="${ad.imageUrl}" alt="${ad.title}">
-                            </a>
-                        `;
-                        document.getElementById('leftAd').style.display = 'block';
-                    }
-                });
+        function createCategorySection(category, cards) {
+            const section = document.createElement('section');
+            section.id = `category-${category.id}`;
+            section.className = 'io-card mb-5';
 
-            fetch('/api/public/ads/right')
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success && result.data.length > 0) {
-                        const ad = result.data[0];
-                        document.getElementById('rightAdContent').innerHTML = `
-                            <a href="${ad.linkUrl}" target="_blank">
-                                <img src="${ad.imageUrl}" alt="${ad.title}">
-                            </a>
-                        `;
-                        document.getElementById('rightAd').style.display = 'block';
-                    }
-                });
+            const heading = document.createElement('div');
+            heading.className = 'section-heading';
+
+            const title = document.createElement('h4');
+            const iconEl = document.createElement('i');
+            const iconClass = category.icon && category.icon.trim().length ? category.icon : 'iconfont icon-tag';
+            iconEl.className = `${iconClass} icon-lg mr-2`;
+            title.appendChild(iconEl);
+            title.appendChild(document.createTextNode(category.displayName || category.name));
+            heading.appendChild(title);
+
+            section.appendChild(heading);
+
+            const row = document.createElement('div');
+            row.className = 'row';
+            cards.forEach(card => row.appendChild(createCardElement(card)));
+            section.appendChild(row);
+
+            return section;
         }
 
-        function closeAd(adId) {
-            document.getElementById(adId).style.display = 'none';
-        }
+        function renderCategories(categories) {
+            const container = document.getElementById('categoriesContainer');
+            if (!container) {
+                return;
+            }
+            container.innerHTML = '';
 
-        function performSearch() {
-            const query = document.getElementById('searchInput').value;
-            if (!query) return;
+            const sections = categories
+                .map(category => {
+                    const cards = categoryCardsMap.get(category.id) || [];
+                    if (!cards.length) {
+                        return null;
+                    }
+                    return createCategorySection(category, cards);
+                })
+                .filter(Boolean);
 
-            const engine = document.querySelector('input[name="search-engine"]:checked').value;
-            let url = '';
-
-            switch (engine) {
-                case 'google':
-                    url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-                    break;
-                case 'baidu':
-                    url = `https://www.baidu.com/s?wd=${encodeURIComponent(query)}`;
-                    break;
-                case 'bing':
-                    url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
-                    break;
-                case 'github':
-                    url = `https://github.com/search?q=${encodeURIComponent(query)}`;
-                    break;
-                case 'local':
-                    fetch(`/api/public/cards/search?keyword=${encodeURIComponent(query)}`)
-                        .then(response => response.json())
-                        .then(result => {
-                            if (result.success) {
-                                displaySearchResults(result.data);
-                            }
-                        });
-                    return;
+            if (!sections.length) {
+                container.appendChild(createEmptyState('当前暂无可展示的导航内容，请稍后再试。'));
+                return;
             }
 
-            window.open(url, '_blank');
+            sections.forEach(section => container.appendChild(section));
+        }
+
+        async function fetchCardsByCategory(categoryId) {
+            try {
+                const response = await fetch(`${API_BASE}/public/cards/category/${categoryId}`);
+                const result = await response.json();
+                if (result.success && Array.isArray(result.data)) {
+                    return result.data;
+                }
+            } catch (error) {
+                console.error(error);
+            }
+            return [];
+        }
+
+        function flattenCategories(categories, level = 0, path = []) {
+            const result = [];
+            categories.forEach(category => {
+                const currentPath = [...path, category.name];
+                const item = {
+                    id: category.id,
+                    name: category.name,
+                    displayName: currentPath.join(' / '),
+                    icon: category.icon,
+                    level,
+                    parentId: category.parentId
+                };
+                result.push(item);
+                if (category.children && category.children.length) {
+                    result.push(...flattenCategories(category.children, level + 1, currentPath));
+                }
+            });
+            return result;
+        }
+
+        async function loadCategories(force = false) {
+            if (!force && dataLoaded && !showingSearchResults) {
+                renderSidebar(availableCategories);
+                renderCategories(availableCategories);
+                return;
+            }
+
+            setCategoriesLoading();
+
+            try {
+                const response = await fetch(`${API_BASE}/public/categories`);
+                const result = await response.json();
+
+                if (!result.success) {
+                    renderCategories([]);
+                    showNotification(result.message || '加载栏目失败，请稍后重试。', 'danger');
+                    return;
+                }
+
+                const flattened = flattenCategories(Array.isArray(result.data) ? result.data : []);
+
+                categoryCardsMap = new Map();
+                categoryNameMap = new Map();
+
+                const promises = flattened.map(async category => {
+                    categoryNameMap.set(category.id, category.displayName || category.name);
+                    const cards = await fetchCardsByCategory(category.id);
+                    categoryCardsMap.set(category.id, cards);
+                });
+
+                await Promise.all(promises);
+
+                availableCategories = flattened.filter(category => {
+                    const cards = categoryCardsMap.get(category.id) || [];
+                    return cards.length > 0;
+                });
+
+                dataLoaded = true;
+                showingSearchResults = false;
+
+                renderSidebar(availableCategories);
+                renderCategories(availableCategories);
+            } catch (error) {
+                console.error(error);
+                renderCategories([]);
+                showNotification('加载导航数据时出现异常，请检查网络后重试。', 'danger');
+            }
         }
 
         function displaySearchResults(results) {
+            showingSearchResults = true;
             const container = document.getElementById('categoriesContainer');
-            container.innerHTML = '<div class="category-section"><div class="category-title"><i class="fas fa-search"></i> 搜索结果</div><div class="card-grid" id="searchResults"></div></div>';
-            
-            const grid = document.getElementById('searchResults');
-            results.forEach(card => {
-                const cardElement = document.createElement('a');
-                cardElement.className = 'nav-card';
-                cardElement.href = card.url;
-                cardElement.target = '_blank';
-                cardElement.innerHTML = `
-                    <div class="icon">
-                        ${card.logo ? `<img src="${card.logo}" style="width: 32px; height: 32px; border-radius: 5px;">` : '<i class="fas fa-globe"></i>'}
-                    </div>
-                    <h5>${card.name}</h5>
-                    <p>${card.description || '暂无描述'}</p>
-                `;
-                grid.appendChild(cardElement);
+            if (!container) {
+                return;
+            }
+            container.innerHTML = '';
+
+            const section = document.createElement('section');
+            section.id = 'search-results';
+            section.className = 'io-card mb-5';
+
+            const heading = document.createElement('div');
+            heading.className = 'section-heading';
+
+            const title = document.createElement('h4');
+            const iconEl = document.createElement('i');
+            iconEl.className = 'fas fa-search icon-lg mr-2';
+            title.appendChild(iconEl);
+            title.appendChild(document.createTextNode('搜索结果'));
+            heading.appendChild(title);
+
+            const actions = document.createElement('div');
+            actions.className = 'search-result-actions';
+            const backBtn = document.createElement('button');
+            backBtn.type = 'button';
+            backBtn.className = 'btn btn-sm btn-outline-secondary';
+            backBtn.textContent = '返回全部导航';
+            backBtn.addEventListener('click', () => {
+                showingSearchResults = false;
+                renderSidebar(availableCategories);
+                renderCategories(availableCategories);
             });
+            actions.appendChild(backBtn);
+            heading.appendChild(actions);
+
+            section.appendChild(heading);
+
+            if (!results.length) {
+                section.appendChild(createEmptyState('没有找到匹配的站点，换个关键词试试吧。', 'fas fa-search-minus'));
+                container.appendChild(section);
+                renderSidebar([
+                    {
+                        id: 'search-results',
+                        anchorId: 'search-results',
+                        displayName: '搜索结果',
+                        icon: 'fas fa-search',
+                        level: 0
+                    }
+                ]);
+                return;
+            }
+
+            const grouped = new Map();
+            results.forEach(card => {
+                const categoryId = card.categoryId;
+                const title = categoryNameMap.get(categoryId) || '未分类';
+                if (!grouped.has(categoryId)) {
+                    grouped.set(categoryId, { title, cards: [] });
+                }
+                grouped.get(categoryId).cards.push(card);
+            });
+
+            grouped.forEach(value => {
+                const groupSection = document.createElement('div');
+                groupSection.className = 'mb-4';
+
+                const groupTitle = document.createElement('h5');
+                groupTitle.className = 'text-muted mb-3';
+                groupTitle.innerHTML = `<i class="far fa-folder-open mr-2"></i>${value.title}`;
+                groupSection.appendChild(groupTitle);
+
+                const row = document.createElement('div');
+                row.className = 'row';
+                value.cards.forEach(card => row.appendChild(createCardElement(card)));
+                groupSection.appendChild(row);
+
+                section.appendChild(groupSection);
+            });
+
+            container.appendChild(section);
+            renderSidebar([
+                {
+                    id: 'search-results',
+                    anchorId: 'search-results',
+                    displayName: '搜索结果',
+                    icon: 'fas fa-search',
+                    level: 0
+                }
+            ]);
         }
 
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                performSearch();
+        async function loadFriendLinks() {
+            const container = document.getElementById('friendLinksContainer');
+            if (!container) {
+                return;
             }
-        });
+            try {
+                const response = await fetch(`${API_BASE}/public/friendlinks`);
+                const result = await response.json();
+                container.innerHTML = '';
 
-        window.onload = function() {
-            loadCategories();
-            loadFriendLinks();
-            loadAds();
+                if (result.success && Array.isArray(result.data) && result.data.length) {
+                    const links = [...result.data].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+                    links.forEach(link => {
+                        const anchor = document.createElement('a');
+                        anchor.href = link.url;
+                        anchor.target = '_blank';
+                        anchor.rel = 'noopener';
+                        anchor.title = link.description || link.name;
+                        anchor.textContent = link.name;
+                        container.appendChild(anchor);
+                    });
+                } else {
+                    container.innerHTML = '<span class="text-muted">暂无友链内容。</span>';
+                }
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = '<span class="text-muted">友链加载失败。</span>';
+            }
+        }
+
+        function loadAds() {
+            fetch(`${API_BASE}/public/ads/left`)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success && Array.isArray(result.data) && result.data.length) {
+                        const ad = result.data[0];
+                        const content = document.getElementById('leftAdContent');
+                        if (content) {
+                            content.innerHTML = `
+                                <a href="${ad.linkUrl}" target="_blank" rel="noopener">
+                                    <img src="${ad.imageUrl}" alt="${ad.title}">
+                                </a>
+                            `;
+                            const wrapper = document.getElementById('leftAd');
+                            if (wrapper) {
+                                wrapper.style.display = 'block';
+                            }
+                        }
+                    }
+                })
+                .catch(() => {});
+
+            fetch(`${API_BASE}/public/ads/right`)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success && Array.isArray(result.data) && result.data.length) {
+                        const ad = result.data[0];
+                        const content = document.getElementById('rightAdContent');
+                        if (content) {
+                            content.innerHTML = `
+                                <a href="${ad.linkUrl}" target="_blank" rel="noopener">
+                                    <img src="${ad.imageUrl}" alt="${ad.title}">
+                                </a>
+                            `;
+                            const wrapper = document.getElementById('rightAd');
+                            if (wrapper) {
+                                wrapper.style.display = 'block';
+                            }
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
+
+        function closeAd(adId) {
+            const element = document.getElementById(adId);
+            if (element) {
+                element.style.display = 'none';
+            }
+        }
+
+        function loadHitokoto() {
+            fetch('https://v1.hitokoto.cn')
+                .then(response => response.json())
+                .then(data => {
+                    const anchor = document.getElementById('hitokoto_text');
+                    if (anchor && data && data.hitokoto) {
+                        if (data.uuid) {
+                            anchor.href = `https://hitokoto.cn/?uuid=${data.uuid}`;
+                        }
+                        anchor.textContent = data.hitokoto;
+                    }
+                })
+                .catch(() => {
+                    const anchor = document.getElementById('hitokoto_text');
+                    if (anchor) {
+                        anchor.textContent = '欢迎来到网址导航';
+                        anchor.removeAttribute('href');
+                    }
+                });
+        }
+
+        async function performSearch() {
+            const searchInput = document.getElementById('search-text');
+            if (!searchInput) {
+                return;
+            }
+            const query = searchInput.value.trim();
+            if (!query) {
+                showNotification('请输入搜索关键词。', 'warning');
+                searchInput.focus();
+                return;
+            }
+
+            const checked = document.querySelector('input[name="search-engine"]:checked');
+            if (!checked) {
+                return;
+            }
+
+            if (checked.value === 'local') {
+                try {
+                    const response = await fetch(`${API_BASE}/public/cards/search?keyword=${encodeURIComponent(query)}`);
+                    const result = await response.json();
+                    if (result.success) {
+                        displaySearchResults(Array.isArray(result.data) ? result.data : []);
+                    } else {
+                        showNotification(result.message || '搜索失败，请稍后再试。', 'danger');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    showNotification('站内搜索失败，请检查网络后再试。', 'danger');
+                }
+            } else {
+                window.open(`${checked.value}${encodeURIComponent(query)}`, '_blank');
+            }
+        }
+
+        function showNotification(message, type = 'info', timeout = 4000) {
+            const banner = document.getElementById('notificationBanner');
+            if (!banner) {
+                return;
+            }
+
+            banner.innerHTML = '';
+            if (!message) {
+                return;
+            }
+
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.setAttribute('role', 'alert');
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="close" data-dismiss="alert" aria-label="关闭">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            `;
+            banner.appendChild(alert);
+
+            if (timeout) {
+                setTimeout(() => {
+                    if (window.jQuery && $(alert).length) {
+                        $(alert).alert('close');
+                    } else if (alert && alert.parentNode) {
+                        alert.parentNode.removeChild(alert);
+                    }
+                }, timeout);
+            }
+        }
+
+        window.closeAd = closeAd;
+    </script>
+    <script>
+        window.WIDGET = {
+            CONFIG: {
+                modules: '01234',
+                background: 5,
+                tmpColor: 'E4C600',
+                tmpSize: 14,
+                cityColor: 'E4C600',
+                citySize: 14,
+                aqiColor: '#E4C600',
+                aqiSize: 14,
+                weatherIconSize: 28,
+                alertIconSize: 18,
+                padding: '10px 10px 10px 10px',
+                shadow: '1',
+                language: 'auto',
+                borderRadius: 5,
+                fixed: 'false',
+                vertical: 'middle',
+                horizontal: 'left',
+                key: '085791e805a24491b43b06cf58ab31e7'
+            }
         };
     </script>
+    <script src="https://widget.qweather.net/simple/static/js/he-simple-common.js?v=2.0"></script>
 </body>
 </html>
