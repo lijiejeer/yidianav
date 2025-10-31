@@ -37,4 +37,5 @@ navigation.db
 navigation.db-journal
 uploads/
 backups/
+auto_backup_config.properties
 *.log

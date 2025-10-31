@@ -1,9 +1,12 @@
 package jbc.com.cn.yidianav.service;
 
 import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.file.*;
 import java.text.SimpleDateFormat;
@@ -20,6 +23,15 @@ public class BackupService {
     private static final String DB_FILE = "navigation.db";
     private static final String UPLOAD_DIR = "uploads";
     private static final int MAX_BACKUPS = 5;
+    private static final String AUTO_BACKUP_CONFIG_FILE = "auto_backup_config.properties";
+    
+    @Value("${spring.web.resources.static-locations:classpath:/static/}")
+    private String staticResourceLocation;
+    
+    private boolean autoBackupEnabled = false;
+    private int autoBackupDays = 7;
+    private int autoBackupMonths = 0;
+    private long lastAutoBackupTime = 0;
 
     public String createBackup() throws IOException {
         File backupDir = new File(BACKUP_DIR);
@@ -147,6 +159,158 @@ public class BackupService {
         }
     }
 
-    public void scheduleAutoBackup(int days, int months) {
+    @PostConstruct
+    public void loadAutoBackupConfig() {
+        File configFile = new File(AUTO_BACKUP_CONFIG_FILE);
+        if (configFile.exists()) {
+            try (FileInputStream fis = new FileInputStream(configFile)) {
+                Properties props = new Properties();
+                props.load(fis);
+                autoBackupEnabled = Boolean.parseBoolean(props.getProperty("enabled", "false"));
+                autoBackupDays = Integer.parseInt(props.getProperty("days", "7"));
+                autoBackupMonths = Integer.parseInt(props.getProperty("months", "0"));
+                lastAutoBackupTime = Long.parseLong(props.getProperty("lastBackup", "0"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    public void saveAutoBackupConfig(boolean enabled, int days, int months) throws IOException {
+        this.autoBackupEnabled = enabled;
+        this.autoBackupDays = days;
+        this.autoBackupMonths = months;
+        
+        Properties props = new Properties();
+        props.setProperty("enabled", String.valueOf(enabled));
+        props.setProperty("days", String.valueOf(days));
+        props.setProperty("months", String.valueOf(months));
+        props.setProperty("lastBackup", String.valueOf(lastAutoBackupTime));
+        
+        try (FileOutputStream fos = new FileOutputStream(AUTO_BACKUP_CONFIG_FILE)) {
+            props.store(fos, "Auto Backup Configuration");
+        }
+    }
+    
+    public Map<String, Object> getAutoBackupConfig() {
+        Map<String, Object> config = new HashMap<>();
+        config.put("enabled", autoBackupEnabled);
+        config.put("days", autoBackupDays);
+        config.put("months", autoBackupMonths);
+        config.put("lastBackup", lastAutoBackupTime > 0 ? new Date(lastAutoBackupTime) : null);
+        return config;
+    }
+    
+    @Scheduled(cron = "0 0 2 * * ?")
+    public void executeAutoBackup() {
+        if (!autoBackupEnabled) {
+            return;
+        }
+        
+        long currentTime = System.currentTimeMillis();
+        long intervalMillis = (autoBackupDays * 24L * 60L * 60L * 1000L) + (autoBackupMonths * 30L * 24L * 60L * 60L * 1000L);
+        
+        if (lastAutoBackupTime == 0 || (currentTime - lastAutoBackupTime) >= intervalMillis) {
+            try {
+                createBackup();
+                lastAutoBackupTime = currentTime;
+                
+                Properties props = new Properties();
+                File configFile = new File(AUTO_BACKUP_CONFIG_FILE);
+                if (configFile.exists()) {
+                    try (FileInputStream fis = new FileInputStream(configFile)) {
+                        props.load(fis);
+                    }
+                }
+                props.setProperty("lastBackup", String.valueOf(lastAutoBackupTime));
+                try (FileOutputStream fos = new FileOutputStream(AUTO_BACKUP_CONFIG_FILE)) {
+                    props.store(fos, "Auto Backup Configuration");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    public void deleteBackup(String filename) throws IOException {
+        File backupFile = new File(BACKUP_DIR, filename);
+        if (!backupFile.exists()) {
+            throw new IOException("Backup file not found: " + filename);
+        }
+        
+        if (!backupFile.getCanonicalPath().startsWith(new File(BACKUP_DIR).getCanonicalPath())) {
+            throw new IOException("Invalid backup file path");
+        }
+        
+        if (!backupFile.delete()) {
+            throw new IOException("Failed to delete backup file: " + filename);
+        }
+    }
+    
+    public String createInitialDataZip() throws IOException {
+        File backupDir = new File(BACKUP_DIR);
+        if (!backupDir.exists()) {
+            backupDir.mkdirs();
+        }
+        
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String zipFileName = "web_tool_init_" + timestamp + ".zip";
+        String zipFilePath = BACKUP_DIR + File.separator + zipFileName;
+        
+        File webToolDir = new File("src/main/resources/static/web_tool-master");
+        if (!webToolDir.exists()) {
+            throw new IOException("web_tool-master directory not found");
+        }
+        
+        try (FileOutputStream fos = new FileOutputStream(zipFilePath);
+             ZipOutputStream zos = new ZipOutputStream(fos)) {
+            addDirectoryToZip(webToolDir, "web_tool-master", zos);
+        }
+        
+        return zipFileName;
+    }
+    
+    public void importInitialData(MultipartFile file) throws IOException {
+        File tempFile = File.createTempFile("import", ".zip");
+        file.transferTo(tempFile);
+        
+        File targetDir = new File("src/main/resources/static/web_tool-master");
+        if (targetDir.exists()) {
+            FileUtils.deleteDirectory(targetDir);
+        }
+        targetDir.mkdirs();
+        
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(tempFile))) {
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+                String entryName = entry.getName();
+                if (entryName.startsWith("web_tool-master/")) {
+                    entryName = entryName.substring("web_tool-master/".length());
+                }
+                
+                File entryFile = new File(targetDir, entryName);
+                
+                if (!entryFile.getCanonicalPath().startsWith(targetDir.getCanonicalPath())) {
+                    continue;
+                }
+                
+                if (entry.isDirectory()) {
+                    entryFile.mkdirs();
+                } else {
+                    entryFile.getParentFile().mkdirs();
+                    
+                    try (FileOutputStream fos = new FileOutputStream(entryFile)) {
+                        byte[] buffer = new byte[1024];
+                        int length;
+                        while ((length = zis.read(buffer)) > 0) {
+                            fos.write(buffer, 0, length);
+                        }
+                    }
+                }
+                zis.closeEntry();
+            }
+        } finally {
+            tempFile.delete();
+        }
     }
 }

@@ -303,13 +303,49 @@
             <div class="content-card">
                 <h5><i class="fas fa-database"></i> 备份恢复</h5>
                 <div class="row mt-4">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="card">
                             <div class="card-body">
                                 <h6><i class="fas fa-download"></i> 创建备份</h6>
                                 <p class="text-muted">备份数据库和上传文件到ZIP压缩包</p>
-                                <button class="btn btn-success" onclick="createBackup()">
+                                <button class="btn btn-success btn-block" onclick="createBackup()">
                                     <i class="fas fa-download"></i> 立即备份
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6><i class="fas fa-upload"></i> 恢复备份</h6>
+                                <p class="text-muted">从ZIP文件恢复数据</p>
+                                <input type="file" id="restoreFile" accept=".zip" class="form-control-file mb-2">
+                                <button class="btn btn-warning btn-block" onclick="restoreBackup()">
+                                    <i class="fas fa-upload"></i> 恢复数据
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6><i class="fas fa-cog"></i> 自动备份</h6>
+                                <p class="text-muted">配置定时自动备份</p>
+                                <button class="btn btn-info btn-block" onclick="showAutoBackupModal()">
+                                    <i class="fas fa-cog"></i> 配置自动备份
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6><i class="fas fa-file-archive"></i> 导出初始化数据</h6>
+                                <p class="text-muted">将web_tool静态资源打包为初始化数据</p>
+                                <button class="btn btn-primary btn-block" onclick="createInitialZip()">
+                                    <i class="fas fa-file-archive"></i> 创建初始化包
                                 </button>
                             </div>
                         </div>
@@ -317,18 +353,18 @@
                     <div class="col-md-6">
                         <div class="card">
                             <div class="card-body">
-                                <h6><i class="fas fa-upload"></i> 恢复备份</h6>
-                                <p class="text-muted">从ZIP文件恢复数据</p>
-                                <input type="file" id="restoreFile" accept=".zip" class="form-control-file mb-2">
-                                <button class="btn btn-warning" onclick="restoreBackup()">
-                                    <i class="fas fa-upload"></i> 恢复数据
+                                <h6><i class="fas fa-file-import"></i> 导入初始化数据</h6>
+                                <p class="text-muted">从ZIP文件导入web_tool静态资源</p>
+                                <input type="file" id="importInitFile" accept=".zip" class="form-control-file mb-2">
+                                <button class="btn btn-secondary btn-block" onclick="importInitialData()">
+                                    <i class="fas fa-file-import"></i> 导入数据
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="mt-4">
-                    <h6>备份历史</h6>
+                    <h6>备份历史 <small class="text-muted">(最多保留5个备份)</small></h6>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -538,6 +574,51 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
                     <button type="button" class="btn btn-primary" onclick="saveFriendLink()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auto Backup Config Modal -->
+    <div class="modal fade" id="autoBackupModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">自动备份配置</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="autoBackupForm">
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="autoBackupEnabled">
+                                <label class="custom-control-label" for="autoBackupEnabled">启用自动备份</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>备份间隔 - 天数</label>
+                            <input type="number" class="form-control" id="autoBackupDays" min="0" value="7">
+                            <small class="form-text text-muted">设置为0表示不按天数备份</small>
+                        </div>
+                        <div class="form-group">
+                            <label>备份间隔 - 月数</label>
+                            <input type="number" class="form-control" id="autoBackupMonths" min="0" value="0">
+                            <small class="form-text text-muted">设置为0表示不按月数备份</small>
+                        </div>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            <strong>说明：</strong><br>
+                            - 自动备份将在每天凌晨2点检查是否需要执行<br>
+                            - 系统最多保留5个备份文件，超出将自动删除最旧的备份<br>
+                            - 天数和月数会累加计算，例如：7天+1月 = 37天<br>
+                            - 上次备份时间会在下方显示
+                        </div>
+                        <div id="lastBackupInfo" class="text-muted"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAutoBackupConfig()">保存</button>
                 </div>
             </div>
         </div>
