@@ -1,6 +1,530 @@
-<html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网址导航 - 实用的资源导航综合网站</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --hover-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 15px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 120px 15px 20px;
+            border-radius: 50px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            padding: 10px 30px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .search-engines {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-engines label {
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 5px 15px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        .search-engines input[type="radio"]:checked + label {
+            background: rgba(255, 255, 255, 0.4);
+            font-weight: bold;
+        }
+
+        .search-engines input[type="radio"] {
+            display: none;
+        }
+
+        .category-section {
+            margin: 3rem 0;
+        }
+
+        .category-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .nav-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+            text-decoration: none;
+        }
+
+        .nav-card .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .nav-card h5 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .nav-card p {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .floating-ad {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 120px;
+            z-index: 1000;
+        }
+
+        .floating-ad.left {
+            left: 20px;
+        }
+
+        .floating-ad.right {
+            right: 20px;
+        }
+
+        .ad-content {
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .ad-close {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .ad-content img {
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        .friend-links {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 3rem 0;
+        }
+
+        .friend-links h3 {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .friend-links-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .friend-link {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .friend-link:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+        }
+
+        @media (max-width: 768px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .floating-ad {
+                display: none;
+            }
+
+            .search-box input {
+                padding: 12px 100px 12px 15px;
+            }
+
+            .search-btn {
+                padding: 8px 20px;
+            }
+        }
+    </style>
+</head>
 <body>
-<h1>hello word!!!</h1>
-<p>this is a html page</p>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand font-weight-bold" href="/">
+                <i class="fas fa-compass"></i> 网址导航
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#links">友情链接</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">管理后台</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索你想要的内容...">
+                <button class="search-btn" onclick="performSearch()">
+                    <i class="fas fa-search"></i> 搜索
+                </button>
+            </div>
+            <div class="search-engines">
+                <input type="radio" name="search-engine" id="google" value="google">
+                <label for="google"><i class="fab fa-google"></i> Google</label>
+                
+                <input type="radio" name="search-engine" id="baidu" value="baidu" checked>
+                <label for="baidu">百度</label>
+                
+                <input type="radio" name="search-engine" id="bing" value="bing">
+                <label for="bing"><i class="fab fa-microsoft"></i> Bing</label>
+                
+                <input type="radio" name="search-engine" id="github" value="github">
+                <label for="github"><i class="fab fa-github"></i> GitHub</label>
+                
+                <input type="radio" name="search-engine" id="local" value="local">
+                <label for="local"><i class="fas fa-home"></i> 站内</label>
+            </div>
+        </div>
+
+        <div id="categoriesContainer"></div>
+
+        <div class="friend-links" id="links">
+            <h3><i class="fas fa-link"></i> 友情链接</h3>
+            <div class="friend-links-grid" id="friendLinksContainer"></div>
+        </div>
+    </div>
+
+    <div class="floating-ad left" id="leftAd" style="display: none;">
+        <div class="ad-content">
+            <button class="ad-close" onclick="closeAd('leftAd')">×</button>
+            <div id="leftAdContent"></div>
+        </div>
+    </div>
+
+    <div class="floating-ad right" id="rightAd" style="display: none;">
+        <div class="ad-content">
+            <button class="ad-close" onclick="closeAd('rightAd')">×</button>
+            <div id="rightAdContent"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 网址导航. All rights reserved.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function loadCategories() {
+            fetch('/api/public/categories')
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        displayCategories(result.data);
+                    }
+                });
+        }
+
+        function displayCategories(categories) {
+            const container = document.getElementById('categoriesContainer');
+            container.innerHTML = '';
+
+            categories.forEach(category => {
+                const section = document.createElement('div');
+                section.className = 'category-section';
+
+                const title = document.createElement('div');
+                title.className = 'category-title';
+                title.innerHTML = `<i class="${category.icon || 'fas fa-folder'}"></i> ${category.name}`;
+                section.appendChild(title);
+
+                const cardGrid = document.createElement('div');
+                cardGrid.className = 'card-grid';
+
+                fetch(`/api/public/cards/category/${category.id}`)
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success && result.data.length > 0) {
+                            result.data.forEach(card => {
+                                const cardElement = document.createElement('a');
+                                cardElement.className = 'nav-card';
+                                cardElement.href = card.url;
+                                cardElement.target = '_blank';
+                                cardElement.innerHTML = `
+                                    <div class="icon">
+                                        ${card.logo ? `<img src="${card.logo}" style="width: 32px; height: 32px; border-radius: 5px;" onerror="this.outerHTML='<i class=\\'fas fa-globe\\'></i>'">` : '<i class="fas fa-globe"></i>'}
+                                    </div>
+                                    <h5>${card.name}</h5>
+                                    <p>${card.description || '暂无描述'}</p>
+                                `;
+                                cardGrid.appendChild(cardElement);
+                            });
+                        }
+                    });
+
+                section.appendChild(cardGrid);
+                container.appendChild(section);
+            });
+        }
+
+        function loadFriendLinks() {
+            fetch('/api/public/friendlinks')
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success && result.data.length > 0) {
+                        const container = document.getElementById('friendLinksContainer');
+                        container.innerHTML = '';
+                        result.data.forEach(link => {
+                            const linkElement = document.createElement('a');
+                            linkElement.className = 'friend-link';
+                            linkElement.href = link.url;
+                            linkElement.target = '_blank';
+                            linkElement.textContent = link.name;
+                            container.appendChild(linkElement);
+                        });
+                    }
+                });
+        }
+
+        function loadAds() {
+            fetch('/api/public/ads/left')
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success && result.data.length > 0) {
+                        const ad = result.data[0];
+                        document.getElementById('leftAdContent').innerHTML = `
+                            <a href="${ad.linkUrl}" target="_blank">
+                                <img src="${ad.imageUrl}" alt="${ad.title}">
+                            </a>
+                        `;
+                        document.getElementById('leftAd').style.display = 'block';
+                    }
+                });
+
+            fetch('/api/public/ads/right')
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success && result.data.length > 0) {
+                        const ad = result.data[0];
+                        document.getElementById('rightAdContent').innerHTML = `
+                            <a href="${ad.linkUrl}" target="_blank">
+                                <img src="${ad.imageUrl}" alt="${ad.title}">
+                            </a>
+                        `;
+                        document.getElementById('rightAd').style.display = 'block';
+                    }
+                });
+        }
+
+        function closeAd(adId) {
+            document.getElementById(adId).style.display = 'none';
+        }
+
+        function performSearch() {
+            const query = document.getElementById('searchInput').value;
+            if (!query) return;
+
+            const engine = document.querySelector('input[name="search-engine"]:checked').value;
+            let url = '';
+
+            switch (engine) {
+                case 'google':
+                    url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                    break;
+                case 'baidu':
+                    url = `https://www.baidu.com/s?wd=${encodeURIComponent(query)}`;
+                    break;
+                case 'bing':
+                    url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+                    break;
+                case 'github':
+                    url = `https://github.com/search?q=${encodeURIComponent(query)}`;
+                    break;
+                case 'local':
+                    fetch(`/api/public/cards/search?keyword=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.success) {
+                                displaySearchResults(result.data);
+                            }
+                        });
+                    return;
+            }
+
+            window.open(url, '_blank');
+        }
+
+        function displaySearchResults(results) {
+            const container = document.getElementById('categoriesContainer');
+            container.innerHTML = '<div class="category-section"><div class="category-title"><i class="fas fa-search"></i> 搜索结果</div><div class="card-grid" id="searchResults"></div></div>';
+            
+            const grid = document.getElementById('searchResults');
+            results.forEach(card => {
+                const cardElement = document.createElement('a');
+                cardElement.className = 'nav-card';
+                cardElement.href = card.url;
+                cardElement.target = '_blank';
+                cardElement.innerHTML = `
+                    <div class="icon">
+                        ${card.logo ? `<img src="${card.logo}" style="width: 32px; height: 32px; border-radius: 5px;">` : '<i class="fas fa-globe"></i>'}
+                    </div>
+                    <h5>${card.name}</h5>
+                    <p>${card.description || '暂无描述'}</p>
+                `;
+                grid.appendChild(cardElement);
+            });
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        window.onload = function() {
+            loadCategories();
+            loadFriendLinks();
+            loadAds();
+        };
+    </script>
 </body>
 </html>
