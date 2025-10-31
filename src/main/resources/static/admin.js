@@ -579,6 +579,9 @@ function loadBackups() {
                             <a href="${API_BASE}/admin/backup/download/${backup.name}" class="btn btn-sm btn-success">
                                 <i class="fas fa-download"></i> 下载
                             </a>
+                            <button class="btn btn-sm btn-danger" onclick="deleteBackup('${backup.name}')">
+                                <i class="fas fa-trash"></i> 删除
+                            </button>
                         </td>
                     </tr>
                 `).join('');
@@ -628,6 +631,121 @@ function restoreBackup() {
         if (result.success) {
             alert('备份恢复成功！');
             location.reload();
+        } else {
+            alert(result.message);
+        }
+    });
+}
+
+function deleteBackup(filename) {
+    if (!confirm('确定要删除这个备份文件吗？')) return;
+
+    fetch(`${API_BASE}/admin/backup/delete/${filename}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+    })
+    .then(r => r.json())
+    .then(result => {
+        if (result.success) {
+            alert('备份删除成功！');
+            loadBackups();
+        } else {
+            alert(result.message);
+        }
+    });
+}
+
+function showAutoBackupModal() {
+    fetch(`${API_BASE}/admin/backup/auto-config`, { headers: getAuthHeaders() })
+        .then(r => r.json())
+        .then(result => {
+            if (result.success) {
+                document.getElementById('autoBackupEnabled').checked = result.data.enabled;
+                document.getElementById('autoBackupDays').value = result.data.days;
+                document.getElementById('autoBackupMonths').value = result.data.months;
+                
+                const lastBackupInfo = document.getElementById('lastBackupInfo');
+                if (result.data.lastBackup) {
+                    lastBackupInfo.innerHTML = '<small>上次自动备份时间：' + new Date(result.data.lastBackup).toLocaleString() + '</small>';
+                } else {
+                    lastBackupInfo.innerHTML = '<small>尚未执行过自动备份</small>';
+                }
+                
+                $('#autoBackupModal').modal('show');
+            }
+        });
+}
+
+function saveAutoBackupConfig() {
+    const config = {
+        enabled: document.getElementById('autoBackupEnabled').checked,
+        days: parseInt(document.getElementById('autoBackupDays').value),
+        months: parseInt(document.getElementById('autoBackupMonths').value)
+    };
+
+    if (config.days === 0 && config.months === 0 && config.enabled) {
+        alert('请至少设置天数或月数！');
+        return;
+    }
+
+    fetch(`${API_BASE}/admin/backup/auto-config`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(config)
+    })
+    .then(r => r.json())
+    .then(result => {
+        if (result.success) {
+            alert('自动备份配置保存成功！');
+            $('#autoBackupModal').modal('hide');
+        } else {
+            alert(result.message);
+        }
+    });
+}
+
+function createInitialZip() {
+    if (!confirm('确定要创建初始化数据包吗？这将打包web_tool-master文件夹内容。')) return;
+
+    fetch(`${API_BASE}/admin/backup/create-init-zip`, {
+        method: 'POST',
+        headers: getAuthHeaders()
+    })
+    .then(r => r.json())
+    .then(result => {
+        if (result.success) {
+            alert('初始化数据包创建成功！文件名：' + result.data);
+            loadBackups();
+        } else {
+            alert(result.message);
+        }
+    });
+}
+
+function importInitialData() {
+    const fileInput = document.getElementById('importInitFile');
+    if (!fileInput.files.length) {
+        alert('请选择初始化数据文件');
+        return;
+    }
+
+    if (!confirm('确定要导入初始化数据吗？这将覆盖当前的web_tool-master内容！')) return;
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    fetch(`${API_BASE}/admin/backup/import-init-data`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: formData
+    })
+    .then(r => r.json())
+    .then(result => {
+        if (result.success) {
+            alert('初始化数据导入成功！');
+            fileInput.value = '';
         } else {
             alert(result.message);
         }

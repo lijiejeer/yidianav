@@ -64,4 +64,52 @@ public class AdminBackupController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @DeleteMapping("/delete/{filename}")
+    public ApiResponse<String> deleteBackup(@PathVariable String filename) {
+        try {
+            backupService.deleteBackup(filename);
+            return ApiResponse.success("Backup deleted successfully");
+        } catch (Exception e) {
+            return ApiResponse.error("Failed to delete backup: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/auto-config")
+    public ApiResponse<Map<String, Object>> getAutoBackupConfig() {
+        return ApiResponse.success(backupService.getAutoBackupConfig());
+    }
+
+    @PostMapping("/auto-config")
+    public ApiResponse<String> saveAutoBackupConfig(@RequestBody Map<String, Object> config) {
+        try {
+            boolean enabled = (Boolean) config.get("enabled");
+            int days = ((Number) config.get("days")).intValue();
+            int months = ((Number) config.get("months")).intValue();
+            backupService.saveAutoBackupConfig(enabled, days, months);
+            return ApiResponse.success("Auto backup configuration saved successfully");
+        } catch (Exception e) {
+            return ApiResponse.error("Failed to save configuration: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/create-init-zip")
+    public ApiResponse<String> createInitialDataZip() {
+        try {
+            String filename = backupService.createInitialDataZip();
+            return ApiResponse.success("Initial data zip created successfully", filename);
+        } catch (Exception e) {
+            return ApiResponse.error("Failed to create initial data zip: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/import-init-data")
+    public ApiResponse<String> importInitialData(@RequestParam("file") MultipartFile file) {
+        try {
+            backupService.importInitialData(file);
+            return ApiResponse.success("Initial data imported successfully");
+        } catch (Exception e) {
+            return ApiResponse.error("Failed to import initial data: " + e.getMessage());
+        }
+    }
 }
