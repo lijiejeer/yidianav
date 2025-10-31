@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - 网址导航</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: #f5f6fa;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 0;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .sidebar-menu li {
+            padding: 0;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 15px 25px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card h3 {
+            font-size: 32px;
+            margin: 10px 0;
+        }
+
+        .stat-card p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #663a8e 100%);
+        }
+
+        .table-responsive {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4><i class="fas fa-compass"></i> 管理后台</h4>
+            <small id="usernameDisplay"></small>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" class="menu-link active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> 仪表盘</a></li>
+            <li><a href="#" class="menu-link" data-section="categories"><i class="fas fa-folder"></i> 栏目管理</a></li>
+            <li><a href="#" class="menu-link" data-section="cards"><i class="fas fa-th"></i> 卡片管理</a></li>
+            <li><a href="#" class="menu-link" data-section="ads"><i class="fas fa-ad"></i> 广告管理</a></li>
+            <li><a href="#" class="menu-link" data-section="friendlinks"><i class="fas fa-link"></i> 友链管理</a></li>
+            <li><a href="#" class="menu-link" data-section="backup"><i class="fas fa-database"></i> 备份恢复</a></li>
+            <li><a href="#" class="menu-link" data-section="profile"><i class="fas fa-user"></i> 个人设置</a></li>
+            <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> 退出登录</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <h4>网址导航管理系统</h4>
+            <div>
+                <a href="/" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-home"></i> 返回首页</a>
+            </div>
+        </div>
+
+        <div id="dashboard" class="section active">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <i class="fas fa-folder fa-2x"></i>
+                        <h3 id="statCategories">0</h3>
+                        <p>栏目数量</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <i class="fas fa-th fa-2x"></i>
+                        <h3 id="statCards">0</h3>
+                        <p>导航卡片</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <i class="fas fa-link fa-2x"></i>
+                        <h3 id="statLinks">0</h3>
+                        <p>友情链接</p>
+                    </div>
+                </div>
+            </div>
+            <div class="content-card mt-4">
+                <h5><i class="fas fa-history"></i> 最近登录记录</h5>
+                <div class="table-responsive mt-3">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>登录时间</th>
+                                <th>IP地址</th>
+                                <th>浏览器</th>
+                            </tr>
+                        </thead>
+                        <tbody id="loginHistoryTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="categories" class="section">
+            <div class="content-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5><i class="fas fa-folder"></i> 栏目管理</h5>
+                    <button class="btn btn-primary" onclick="showCategoryModal()"><i class="fas fa-plus"></i> 新增栏目</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>名称</th>
+                                <th>图标</th>
+                                <th>排序</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="cards" class="section">
+            <div class="content-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5><i class="fas fa-th"></i> 卡片管理</h5>
+                    <button class="btn btn-primary" onclick="showCardModal()"><i class="fas fa-plus"></i> 新增卡片</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>名称</th>
+                                <th>链接</th>
+                                <th>所属栏目</th>
+                                <th>排序</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cardsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="ads" class="section">
+            <div class="content-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5><i class="fas fa-ad"></i> 广告管理</h5>
+                    <button class="btn btn-primary" onclick="showAdModal()"><i class="fas fa-plus"></i> 新增广告</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>标题</th>
+                                <th>位置</th>
+                                <th>状态</th>
+                                <th>排序</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="friendlinks" class="section">
+            <div class="content-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5><i class="fas fa-link"></i> 友链管理</h5>
+                    <button class="btn btn-primary" onclick="showFriendLinkModal()"><i class="fas fa-plus"></i> 新增友链</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>名称</th>
+                                <th>链接</th>
+                                <th>排序</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="friendlinksTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="backup" class="section">
+            <div class="content-card">
+                <h5><i class="fas fa-database"></i> 备份恢复</h5>
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6><i class="fas fa-download"></i> 创建备份</h6>
+                                <p class="text-muted">备份数据库和上传文件到ZIP压缩包</p>
+                                <button class="btn btn-success" onclick="createBackup()">
+                                    <i class="fas fa-download"></i> 立即备份
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6><i class="fas fa-upload"></i> 恢复备份</h6>
+                                <p class="text-muted">从ZIP文件恢复数据</p>
+                                <input type="file" id="restoreFile" accept=".zip" class="form-control-file mb-2">
+                                <button class="btn btn-warning" onclick="restoreBackup()">
+                                    <i class="fas fa-upload"></i> 恢复数据
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <h6>备份历史</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>文件名</th>
+                                    <th>大小</th>
+                                    <th>日期</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="backupsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="profile" class="section">
+            <div class="content-card">
+                <h5><i class="fas fa-user"></i> 个人设置</h5>
+                <form id="passwordForm" class="mt-4">
+                    <div class="form-group">
+                        <label>新密码</label>
+                        <input type="password" class="form-control" id="newPassword" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label>确认密码</label>
+                        <input type="password" class="form-control" id="confirmPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> 修改密码
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div class="modal fade" id="categoryModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">栏目信息</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="categoryForm">
+                        <input type="hidden" id="categoryId">
+                        <div class="form-group">
+                            <label>名称</label>
+                            <input type="text" class="form-control" id="categoryName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>图标 (FontAwesome类名)</label>
+                            <input type="text" class="form-control" id="categoryIcon" placeholder="fas fa-star">
+                        </div>
+                        <div class="form-group">
+                            <label>排序</label>
+                            <input type="number" class="form-control" id="categorySort" value="0">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCategory()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Modal -->
+    <div class="modal fade" id="cardModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">卡片信息</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="cardForm">
+                        <input type="hidden" id="cardId">
+                        <div class="form-group">
+                            <label>网址 (先输入网址可自动解析信息)</label>
+                            <div class="input-group">
+                                <input type="url" class="form-control" id="cardUrl" required>
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-info" onclick="parseWebsite()">
+                                        <i class="fas fa-sync"></i> 解析
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>名称</label>
+                            <input type="text" class="form-control" id="cardName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>描述</label>
+                            <textarea class="form-control" id="cardDescription" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Logo URL</label>
+                            <input type="text" class="form-control" id="cardLogo">
+                        </div>
+                        <div class="form-group">
+                            <label>所属栏目</label>
+                            <select class="form-control" id="cardCategory" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label>排序</label>
+                            <input type="number" class="form-control" id="cardSort" value="0">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCard()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ad Modal -->
+    <div class="modal fade" id="adModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">广告信息</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="adForm">
+                        <input type="hidden" id="adId">
+                        <div class="form-group">
+                            <label>标题</label>
+                            <input type="text" class="form-control" id="adTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label>图片URL</label>
+                            <input type="text" class="form-control" id="adImage">
+                        </div>
+                        <div class="form-group">
+                            <label>链接URL</label>
+                            <input type="url" class="form-control" id="adLink">
+                        </div>
+                        <div class="form-group">
+                            <label>位置</label>
+                            <select class="form-control" id="adPosition" required>
+                                <option value="left">左侧</option>
+                                <option value="right">右侧</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>状态</label>
+                            <select class="form-control" id="adEnabled">
+                                <option value="true">启用</option>
+                                <option value="false">禁用</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>排序</label>
+                            <input type="number" class="form-control" id="adSort" value="0">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAd()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FriendLink Modal -->
+    <div class="modal fade" id="friendLinkModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">友链信息</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="friendLinkForm">
+                        <input type="hidden" id="friendLinkId">
+                        <div class="form-group">
+                            <label>名称</label>
+                            <input type="text" class="form-control" id="friendLinkName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>链接</label>
+                            <input type="url" class="form-control" id="friendLinkUrl" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Logo URL</label>
+                            <input type="text" class="form-control" id="friendLinkLogo">
+                        </div>
+                        <div class="form-group">
+                            <label>描述</label>
+                            <textarea class="form-control" id="friendLinkDescription" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>排序</label>
+                            <input type="number" class="form-control" id="friendLinkSort" value="0">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveFriendLink()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/admin.js"></script>
+</body>
+</html>
