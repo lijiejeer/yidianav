@@ -1,14 +1,11 @@
 package jbc.com.cn.yidianav.service;
 
-import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
-import java.nio.file.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,9 +21,6 @@ public class BackupService {
     private static final String UPLOAD_DIR = "uploads";
     private static final int MAX_BACKUPS = 5;
     private static final String AUTO_BACKUP_CONFIG_FILE = "auto_backup_config.properties";
-    
-    @Value("${spring.web.resources.static-locations:classpath:/static/}")
-    private String staticResourceLocation;
     
     private boolean autoBackupEnabled = false;
     private int autoBackupDays = 7;
@@ -244,73 +238,6 @@ public class BackupService {
         
         if (!backupFile.delete()) {
             throw new IOException("Failed to delete backup file: " + filename);
-        }
-    }
-    
-    public String createInitialDataZip() throws IOException {
-        File backupDir = new File(BACKUP_DIR);
-        if (!backupDir.exists()) {
-            backupDir.mkdirs();
-        }
-        
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String zipFileName = "web_tool_init_" + timestamp + ".zip";
-        String zipFilePath = BACKUP_DIR + File.separator + zipFileName;
-        
-        File webToolDir = new File("src/main/resources/static/web_tool-master");
-        if (!webToolDir.exists()) {
-            throw new IOException("web_tool-master directory not found");
-        }
-        
-        try (FileOutputStream fos = new FileOutputStream(zipFilePath);
-             ZipOutputStream zos = new ZipOutputStream(fos)) {
-            addDirectoryToZip(webToolDir, "web_tool-master", zos);
-        }
-        
-        return zipFileName;
-    }
-    
-    public void importInitialData(MultipartFile file) throws IOException {
-        File tempFile = File.createTempFile("import", ".zip");
-        file.transferTo(tempFile);
-        
-        File targetDir = new File("src/main/resources/static/web_tool-master");
-        if (targetDir.exists()) {
-            FileUtils.deleteDirectory(targetDir);
-        }
-        targetDir.mkdirs();
-        
-        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(tempFile))) {
-            ZipEntry entry;
-            while ((entry = zis.getNextEntry()) != null) {
-                String entryName = entry.getName();
-                if (entryName.startsWith("web_tool-master/")) {
-                    entryName = entryName.substring("web_tool-master/".length());
-                }
-                
-                File entryFile = new File(targetDir, entryName);
-                
-                if (!entryFile.getCanonicalPath().startsWith(targetDir.getCanonicalPath())) {
-                    continue;
-                }
-                
-                if (entry.isDirectory()) {
-                    entryFile.mkdirs();
-                } else {
-                    entryFile.getParentFile().mkdirs();
-                    
-                    try (FileOutputStream fos = new FileOutputStream(entryFile)) {
-                        byte[] buffer = new byte[1024];
-                        int length;
-                        while ((length = zis.read(buffer)) > 0) {
-                            fos.write(buffer, 0, length);
-                        }
-                    }
-                }
-                zis.closeEntry();
-            }
-        } finally {
-            tempFile.delete();
         }
     }
 }

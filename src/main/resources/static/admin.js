@@ -5,6 +5,40 @@ let currentAdId = null;
 let currentFriendLinkId = null;
 let categories = [];
 
+const notificationContainer = document.getElementById('notificationContainer');
+
+function showMessage(message, type = 'success', timeout = 3200) {
+    if (!notificationContainer || !message) {
+        return;
+    }
+
+    while (notificationContainer.childElementCount >= 3) {
+        notificationContainer.removeChild(notificationContainer.firstChild);
+    }
+
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show`;
+    alert.setAttribute('role', 'alert');
+    alert.innerHTML = `
+        ${message}
+        <button type="button" class="close" data-dismiss="alert" aria-label="关闭">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    `;
+
+    notificationContainer.appendChild(alert);
+
+    if (timeout) {
+        setTimeout(() => {
+            if (window.jQuery && $(alert).length) {
+                $(alert).alert('close');
+            } else if (alert.parentNode) {
+                alert.parentNode.removeChild(alert);
+            }
+        }, timeout);
+    }
+}
+
 function getAuthHeaders() {
     const token = localStorage.getItem('token');
     return {
@@ -188,12 +222,13 @@ function saveCategory() {
     .then(result => {
         if (result.success) {
             $('#categoryModal').modal('hide');
+            showMessage(result.message || '栏目保存成功');
             loadCategories();
-            alert(result.message);
         } else {
-            alert(result.message);
+            showMessage(result.message || '栏目保存失败', 'danger');
         }
-    });
+    })
+    .catch(() => showMessage('保存栏目时出现异常，请稍后再试。', 'danger'));
 }
 
 function deleteCategory(id) {
@@ -206,12 +241,13 @@ function deleteCategory(id) {
     .then(r => r.json())
     .then(result => {
         if (result.success) {
+            showMessage(result.message || '栏目删除成功');
             loadCategories();
-            alert(result.message);
         } else {
-            alert(result.message);
+            showMessage(result.message || '栏目删除失败', 'danger');
         }
-    });
+    })
+    .catch(() => showMessage('删除栏目时出现异常，请稍后再试。', 'danger'));
 }
 
 function loadCards() {
@@ -294,7 +330,7 @@ function editCard(id) {
 function parseWebsite() {
     const url = document.getElementById('cardUrl').value;
     if (!url) {
-        alert('请先输入网址');
+        showMessage('请先输入网址', 'warning');
         return;
     }
 
@@ -309,11 +345,12 @@ function parseWebsite() {
             if (result.data.name) document.getElementById('cardName').value = result.data.name;
             if (result.data.description) document.getElementById('cardDescription').value = result.data.description;
             if (result.data.logo) document.getElementById('cardLogo').value = result.data.logo;
-            alert('解析成功！');
+            showMessage('解析成功！');
         } else {
-            alert(result.message);
+            showMessage(result.message || '解析失败，请稍后再试。', 'danger');
         }
-    });
+    })
+    .catch(() => showMessage('解析网站信息失败，请稍后再试。', 'danger'));
 }
 
 function saveCard() {
@@ -339,12 +376,13 @@ function saveCard() {
     .then(result => {
         if (result.success) {
             $('#cardModal').modal('hide');
+            showMessage(result.message || '卡片保存成功');
             loadCards();
-            alert(result.message);
         } else {
-            alert(result.message);
+            showMessage(result.message || '卡片保存失败', 'danger');
         }
-    });
+    })
+    .catch(() => showMessage('保存卡片时出现异常，请稍后再试。', 'danger'));
 }
 
 function deleteCard(id) {
@@ -357,12 +395,13 @@ function deleteCard(id) {
     .then(r => r.json())
     .then(result => {
         if (result.success) {
+            showMessage(result.message || '卡片删除成功');
             loadCards();
-            alert(result.message);
         } else {
-            alert(result.message);
+            showMessage(result.message || '卡片删除失败', 'danger');
         }
-    });
+    })
+    .catch(() => showMessage('删除卡片时出现异常，请稍后再试。', 'danger'));
 }
 
 function loadAds() {
@@ -440,12 +479,13 @@ function saveAd() {
     .then(result => {
         if (result.success) {
             $('#adModal').modal('hide');
+            showMessage(result.message || '广告保存成功');
             loadAds();
-            alert(result.message);
         } else {
-            alert(result.message);
+            showMessage(result.message || '广告保存失败', 'danger');
         }
-    });
+    })
+    .catch(() => showMessage('保存广告信息时出现异常，请稍后再试。', 'danger'));
 }
 
 function deleteAd(id) {
@@ -458,12 +498,13 @@ function deleteAd(id) {
     .then(r => r.json())
     .then(result => {
         if (result.success) {
+            showMessage(result.message || '广告删除成功');
             loadAds();
-            alert(result.message);
         } else {
-            alert(result.message);
+            showMessage(result.message || '广告删除失败', 'danger');
         }
-    });
+    })
+    .catch(() => showMessage('删除广告时出现异常，请稍后再试。', 'danger'));
 }
 
 function loadFriendLinks() {
@@ -538,12 +579,13 @@ function saveFriendLink() {
     .then(result => {
         if (result.success) {
             $('#friendLinkModal').modal('hide');
+            showMessage(result.message || '友链保存成功');
             loadFriendLinks();
-            alert(result.message);
         } else {
-            alert(result.message);
+            showMessage(result.message || '友链保存失败', 'danger');
         }
-    });
+    })
+    .catch(() => showMessage('保存友链信息时出现异常，请稍后再试。', 'danger'));
 }
 
 function deleteFriendLink(id) {
@@ -556,37 +598,49 @@ function deleteFriendLink(id) {
     .then(r => r.json())
     .then(result => {
         if (result.success) {
+            showMessage(result.message || '友链删除成功');
             loadFriendLinks();
-            alert(result.message);
         } else {
-            alert(result.message);
+            showMessage(result.message || '友链删除失败', 'danger');
         }
-    });
+    })
+    .catch(() => showMessage('删除友链时出现异常，请稍后再试。', 'danger'));
 }
 
 function loadBackups() {
     fetch(`${API_BASE}/admin/backup/list`, { headers: getAuthHeaders() })
         .then(r => r.json())
         .then(result => {
-            if (result.success) {
-                const tbody = document.getElementById('backupsTable');
-                tbody.innerHTML = result.data.map(backup => `
-                    <tr>
-                        <td>${backup.name}</td>
-                        <td>${(backup.size / 1024 / 1024).toFixed(2)} MB</td>
-                        <td>${new Date(backup.date).toLocaleString()}</td>
-                        <td>
-                            <a href="${API_BASE}/admin/backup/download/${backup.name}" class="btn btn-sm btn-success">
-                                <i class="fas fa-download"></i> 下载
-                            </a>
-                            <button class="btn btn-sm btn-danger" onclick="deleteBackup('${backup.name}')">
-                                <i class="fas fa-trash"></i> 删除
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
+            const tbody = document.getElementById('backupsTable');
+            if (!tbody) {
+                return;
             }
-        });
+
+            if (result.success) {
+                if (result.data.length) {
+                    tbody.innerHTML = result.data.map(backup => `
+                        <tr>
+                            <td>${backup.name}</td>
+                            <td>${(backup.size / 1024 / 1024).toFixed(2)} MB</td>
+                            <td>${new Date(backup.date).toLocaleString()}</td>
+                            <td>
+                                <a href="${API_BASE}/admin/backup/download/${backup.name}" class="btn btn-sm btn-success" download>
+                                    <i class="fas fa-download"></i> 下载
+                                </a>
+                                <button class="btn btn-sm btn-danger" onclick="deleteBackup('${backup.name}')">
+                                    <i class="fas fa-trash"></i> 删除
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">暂无备份文件</td></tr>';
+                }
+            } else {
+                showMessage(result.message || '获取备份列表失败', 'danger');
+            }
+        })
+        .catch(() => showMessage('获取备份列表失败，请稍后再试。', 'danger'));
 }
 
 function createBackup() {
@@ -599,18 +653,19 @@ function createBackup() {
     .then(r => r.json())
     .then(result => {
         if (result.success) {
-            alert('备份创建成功！文件名：' + result.data);
+            showMessage('备份创建成功：' + result.data);
             loadBackups();
         } else {
-            alert(result.message);
+            showMessage(result.message || '备份创建失败', 'danger');
         }
-    });
+    })
+    .catch(() => showMessage('创建备份时出现异常，请稍后再试。', 'danger'));
 }
 
 function restoreBackup() {
     const fileInput = document.getElementById('restoreFile');
     if (!fileInput.files.length) {
-        alert('请选择备份文件');
+        showMessage('请选择备份文件', 'warning');
         return;
     }
 
@@ -629,12 +684,13 @@ function restoreBackup() {
     .then(r => r.json())
     .then(result => {
         if (result.success) {
-            alert('备份恢复成功！');
-            location.reload();
+            showMessage('备份恢复成功！');
+            setTimeout(() => location.reload(), 1200);
         } else {
-            alert(result.message);
+            showMessage(result.message || '备份恢复失败', 'danger');
         }
-    });
+    })
+    .catch(() => showMessage('恢复备份时出现异常，请稍后再试。', 'danger'));
 }
 
 function deleteBackup(filename) {
@@ -647,12 +703,13 @@ function deleteBackup(filename) {
     .then(r => r.json())
     .then(result => {
         if (result.success) {
-            alert('备份删除成功！');
+            showMessage('备份删除成功！');
             loadBackups();
         } else {
-            alert(result.message);
+            showMessage(result.message || '备份删除失败', 'danger');
         }
-    });
+    })
+    .catch(() => showMessage('删除备份文件时出现异常，请稍后再试。', 'danger'));
 }
 
 function showAutoBackupModal() {
@@ -684,7 +741,7 @@ function saveAutoBackupConfig() {
     };
 
     if (config.days === 0 && config.months === 0 && config.enabled) {
-        alert('请至少设置天数或月数！');
+        showMessage('请至少设置天数或月数！', 'warning');
         return;
     }
 
@@ -696,61 +753,15 @@ function saveAutoBackupConfig() {
     .then(r => r.json())
     .then(result => {
         if (result.success) {
-            alert('自动备份配置保存成功！');
+            showMessage('自动备份配置保存成功！');
             $('#autoBackupModal').modal('hide');
         } else {
-            alert(result.message);
+            showMessage(result.message || '自动备份配置保存失败', 'danger');
         }
-    });
-}
-
-function createInitialZip() {
-    if (!confirm('确定要创建初始化数据包吗？这将打包web_tool-master文件夹内容。')) return;
-
-    fetch(`${API_BASE}/admin/backup/create-init-zip`, {
-        method: 'POST',
-        headers: getAuthHeaders()
     })
-    .then(r => r.json())
-    .then(result => {
-        if (result.success) {
-            alert('初始化数据包创建成功！文件名：' + result.data);
-            loadBackups();
-        } else {
-            alert(result.message);
-        }
-    });
+    .catch(() => showMessage('保存自动备份配置时出现异常，请稍后再试。', 'danger'));
 }
 
-function importInitialData() {
-    const fileInput = document.getElementById('importInitFile');
-    if (!fileInput.files.length) {
-        alert('请选择初始化数据文件');
-        return;
-    }
-
-    if (!confirm('确定要导入初始化数据吗？这将覆盖当前的web_tool-master内容！')) return;
-
-    const formData = new FormData();
-    formData.append('file', fileInput.files[0]);
-
-    fetch(`${API_BASE}/admin/backup/import-init-data`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: formData
-    })
-    .then(r => r.json())
-    .then(result => {
-        if (result.success) {
-            alert('初始化数据导入成功！');
-            fileInput.value = '';
-        } else {
-            alert(result.message);
-        }
-    });
-}
 
 document.getElementById('passwordForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -759,7 +770,7 @@ document.getElementById('passwordForm').addEventListener('submit', function(e) {
     const confirmPassword = document.getElementById('confirmPassword').value;
 
     if (newPassword !== confirmPassword) {
-        alert('两次输入的密码不一致！');
+        showMessage('两次输入的密码不一致！', 'warning');
         return;
     }
 
@@ -771,12 +782,13 @@ document.getElementById('passwordForm').addEventListener('submit', function(e) {
     .then(r => r.json())
     .then(result => {
         if (result.success) {
-            alert(result.message || '密码修改成功！');
+            showMessage(result.message || '密码修改成功！');
             this.reset();
         } else {
-            alert(result.message);
+            showMessage(result.message || '密码修改失败', 'danger');
         }
-    });
+    })
+    .catch(() => showMessage('修改密码时出现异常，请稍后再试。', 'danger'));
 });
 
 loadDashboard();
