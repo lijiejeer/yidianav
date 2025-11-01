@@ -50,6 +50,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
             margin-bottom: 1.5rem;
         }
 
@@ -85,6 +87,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .empty-state {
@@ -197,8 +200,8 @@
     </style>
 </head>
 <body class="io-grey-mode">
-    <div class="page-container d-flex">
-        <div id="sidebar" class="sticky sidebar-nav fade animate-nav" style="width: 200px;">
+    <div class="page-container">
+        <div id="sidebar" class="sticky sidebar-nav fade animate-nav" style="width: 170px;">
             <div class="modal-dialog h-100 sidebar-nav-inner">
                 <div class="sidebar-logo border-bottom border-color">
                     <div class="logo overflow-hidden">
@@ -324,7 +327,7 @@
                 </div>
             </div>
 
-            <div class="container-fluid px-md-4 pb-5">
+            <div id="content" class="content-site customize-site pb-5">
                 <div id="notificationBanner" class="notification-banner"></div>
                 <div id="categoriesContainer">
                     <div class="empty-state" id="categoriesLoading">
@@ -461,11 +464,21 @@
                 anchor.appendChild(iconEl);
 
                 const nameSpan = document.createElement('span');
-                nameSpan.dataset.depth = category.level || 0;
-                nameSpan.textContent = category.displayName || category.name;
-                nameSpan.style.setProperty('--depth-padding', `${(category.level || 0) * 16}px`);
+                const depth = category.level || 0;
+                const fullName = category.displayName || category.name || '';
+                const label = depth && fullName.includes(' / ')
+                    ? fullName.split(' / ').pop()
+                    : fullName;
+
+                nameSpan.dataset.depth = depth;
+                nameSpan.textContent = label || '未命名分类';
+                nameSpan.title = fullName || label || '未命名分类';
+                nameSpan.style.setProperty('--depth-padding', `${depth * 16}px`);
+                anchor.title = fullName || label || '未命名分类';
                 anchor.appendChild(nameSpan);
 
+                li.dataset.level = depth;
+                li.dataset.anchor = anchorId;
                 li.appendChild(anchor);
                 sidebarMenu.appendChild(li);
             });
@@ -473,52 +486,118 @@
 
         function createCardElement(card) {
             const col = document.createElement('div');
-            col.className = 'url-card col-12 col-sm-6 col-md-4 col-xl-5a col-xxl-6a';
-            const hasLogo = card.logo && card.logo.trim().length;
-            const logoHtml = hasLogo
-                ? `<img src="${card.logo}" alt="${card.name}" onerror="this.src='/web_tool-master/assets/images/logos/default.webp'">`
-                : '<i class="fas fa-globe-asia fallback-icon"></i>';
+            col.className = 'url-card col-6 col-sm-6 col-md-4 col-xl-5a col-xxl-6a';
 
-            col.innerHTML = `
-                <div class="url-body default">
-                    <a href="${card.url}" target="_blank" class="card no-c mb-4" rel="noopener">
-                        <div class="card-body">
-                            <div class="url-content d-flex align-items-center">
-                                <div class="url-img mr-2 d-flex align-items-center justify-content-center">
-                                    ${logoHtml}
-                                </div>
-                                <div class="url-info flex-fill">
-                                    <div class="text-sm overflowClip_1"><strong>${card.name}</strong></div>
-                                    <p class="overflowClip_1 m-0 text-muted text-xs">${card.description || '暂无描述'}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            `;
+            const name = card.name && card.name.trim().length ? card.name.trim() : '未命名站点';
+            const url = card.url && card.url.trim().length ? card.url.trim() : '#';
+            const description = card.description && card.description.trim().length ? card.description.trim() : '暂无描述';
+
+            const bodyWrapper = document.createElement('div');
+            bodyWrapper.className = 'url-body default';
+
+            const mainLink = document.createElement('a');
+            mainLink.href = url;
+            mainLink.target = url === '#' ? '_self' : '_blank';
+            mainLink.rel = 'noopener noreferrer';
+            mainLink.className = 'card no-c mb-4';
+            mainLink.title = description;
+
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body';
+
+            const content = document.createElement('div');
+            content.className = 'url-content d-flex align-items-center';
+
+            const logoWrapper = document.createElement('div');
+            logoWrapper.className = 'url-img mr-2 d-flex align-items-center justify-content-center';
+
+            if (card.logo && card.logo.trim().length) {
+                const logoImg = document.createElement('img');
+                logoImg.src = card.logo.trim();
+                logoImg.alt = name;
+                logoImg.loading = 'lazy';
+                logoImg.onerror = () => {
+                    logoImg.onerror = null;
+                    logoImg.src = '/web_tool-master/assets/images/logos/default.webp';
+                };
+                logoWrapper.appendChild(logoImg);
+            } else {
+                const fallbackIcon = document.createElement('i');
+                fallbackIcon.className = 'fas fa-globe-asia fallback-icon';
+                logoWrapper.appendChild(fallbackIcon);
+            }
+
+            const infoWrapper = document.createElement('div');
+            infoWrapper.className = 'url-info flex-fill';
+
+            const nameEl = document.createElement('div');
+            nameEl.className = 'text-sm overflowClip_1';
+            const strong = document.createElement('strong');
+            strong.textContent = name;
+            nameEl.appendChild(strong);
+
+            const descEl = document.createElement('p');
+            descEl.className = 'overflowClip_1 m-0 text-muted text-xs';
+            descEl.textContent = description;
+
+            infoWrapper.appendChild(nameEl);
+            infoWrapper.appendChild(descEl);
+
+            content.appendChild(logoWrapper);
+            content.appendChild(infoWrapper);
+            cardBody.appendChild(content);
+            mainLink.appendChild(cardBody);
+
+            const togoLink = document.createElement('a');
+            togoLink.href = url;
+            togoLink.target = url === '#' ? '_self' : '_blank';
+            togoLink.rel = 'noopener noreferrer nofollow';
+            togoLink.className = 'togo text-center text-muted is-views';
+            togoLink.title = `直达 ${name}`;
+            togoLink.setAttribute('aria-label', `直达 ${name}`);
+            const togoIcon = document.createElement('i');
+            togoIcon.className = 'iconfont icon-goto';
+            togoLink.appendChild(togoIcon);
+
+            bodyWrapper.appendChild(mainLink);
+            bodyWrapper.appendChild(togoLink);
+            col.appendChild(bodyWrapper);
+
             return col;
         }
 
         function createCategorySection(category, cards) {
+            const anchorId = category.anchorId || `category-${category.id}`;
             const section = document.createElement('section');
-            section.id = `category-${category.id}`;
-            section.className = 'io-card mb-5';
+            section.id = anchorId;
+            section.className = 'io-card mb-5 category-section';
+            section.dataset.level = category.level || 0;
 
             const heading = document.createElement('div');
-            heading.className = 'section-heading';
+            heading.className = 'section-heading d-flex align-items-center justify-content-between flex-wrap';
 
             const title = document.createElement('h4');
-            const iconEl = document.createElement('i');
-            const iconClass = category.icon && category.icon.trim().length ? category.icon : 'iconfont icon-tag';
-            iconEl.className = `${iconClass} icon-lg mr-2`;
-            title.appendChild(iconEl);
-            title.appendChild(document.createTextNode(category.displayName || category.name));
-            heading.appendChild(title);
+            title.className = 'text-gray text-lg mb-4 d-flex align-items-center';
 
+            const iconEl = document.createElement('i');
+            const iconClass = category.icon && category.icon.trim().length ? category.icon.trim() : 'iconfont icon-tag';
+            iconEl.className = `site-tag icon-lg mr-2 ${iconClass}`;
+            iconEl.id = `${anchorId}-icon`;
+            title.appendChild(iconEl);
+
+            const titleText = document.createElement('span');
+            const headingText = category.level && category.displayName
+                ? category.displayName.split(' / ').pop()
+                : (category.displayName || category.name);
+            titleText.textContent = headingText || '未命名分类';
+            titleText.title = category.displayName || headingText || '未命名分类';
+            title.appendChild(titleText);
+
+            heading.appendChild(title);
             section.appendChild(heading);
 
             const row = document.createElement('div');
-            row.className = 'row';
+            row.className = 'row row-md';
             cards.forEach(card => row.appendChild(createCardElement(card)));
             section.appendChild(row);
 
@@ -566,14 +645,27 @@
         function flattenCategories(categories, level = 0, path = []) {
             const result = [];
             categories.forEach(category => {
-                const currentPath = [...path, category.name];
+                const normalizedName = typeof category.name === 'string' && category.name.trim().length
+                    ? category.name.trim()
+                    : '未命名分类';
+                const currentPath = [...path, normalizedName];
+                const anchorId = category.anchorId && category.anchorId.trim().length
+                    ? category.anchorId.trim()
+                    : `category-${category.id}`;
+
+                if (!category.anchorId || !category.anchorId.trim().length) {
+                    category.anchorId = anchorId;
+                }
+
                 const item = {
                     id: category.id,
-                    name: category.name,
+                    name: normalizedName,
                     displayName: currentPath.join(' / '),
                     icon: category.icon,
                     level,
-                    parentId: category.parentId
+                    parentId: category.parentId,
+                    anchorId,
+                    path: currentPath
                 };
                 result.push(item);
                 if (category.children && category.children.length) {
@@ -642,20 +734,22 @@
 
             const section = document.createElement('section');
             section.id = 'search-results';
-            section.className = 'io-card mb-5';
+            section.className = 'io-card mb-5 category-section';
 
             const heading = document.createElement('div');
-            heading.className = 'section-heading';
+            heading.className = 'section-heading d-flex align-items-center justify-content-between flex-wrap';
 
             const title = document.createElement('h4');
+            title.className = 'text-gray text-lg mb-4 d-flex align-items-center';
             const iconEl = document.createElement('i');
-            iconEl.className = 'fas fa-search icon-lg mr-2';
+            iconEl.className = 'site-tag icon-lg mr-2 fas fa-search';
+            iconEl.id = 'search-results-icon';
             title.appendChild(iconEl);
             title.appendChild(document.createTextNode('搜索结果'));
             heading.appendChild(title);
 
             const actions = document.createElement('div');
-            actions.className = 'search-result-actions';
+            actions.className = 'search-result-actions mb-3';
             const backBtn = document.createElement('button');
             backBtn.type = 'button';
             backBtn.className = 'btn btn-sm btn-outline-secondary';
@@ -688,9 +782,9 @@
             const grouped = new Map();
             results.forEach(card => {
                 const categoryId = card.categoryId;
-                const title = categoryNameMap.get(categoryId) || '未分类';
+                const groupTitleText = categoryNameMap.get(categoryId) || '未分类';
                 if (!grouped.has(categoryId)) {
-                    grouped.set(categoryId, { title, cards: [] });
+                    grouped.set(categoryId, { title: groupTitleText, cards: [] });
                 }
                 grouped.get(categoryId).cards.push(card);
             });
@@ -700,12 +794,15 @@
                 groupSection.className = 'mb-4';
 
                 const groupTitle = document.createElement('h5');
-                groupTitle.className = 'text-muted mb-3';
-                groupTitle.innerHTML = `<i class="far fa-folder-open mr-2"></i>${value.title}`;
+                groupTitle.className = 'text-muted mb-3 d-flex align-items-center';
+                const folderIcon = document.createElement('i');
+                folderIcon.className = 'far fa-folder-open mr-2';
+                groupTitle.appendChild(folderIcon);
+                groupTitle.appendChild(document.createTextNode(value.title));
                 groupSection.appendChild(groupTitle);
 
                 const row = document.createElement('div');
-                row.className = 'row';
+                row.className = 'row row-md';
                 value.cards.forEach(card => row.appendChild(createCardElement(card)));
                 groupSection.appendChild(row);
 
@@ -740,7 +837,7 @@
                         const anchor = document.createElement('a');
                         anchor.href = link.url;
                         anchor.target = '_blank';
-                        anchor.rel = 'noopener';
+                        anchor.rel = 'noopener noreferrer';
                         anchor.title = link.description || link.name;
                         anchor.textContent = link.name;
                         container.appendChild(anchor);
@@ -763,7 +860,7 @@
                         const content = document.getElementById('leftAdContent');
                         if (content) {
                             content.innerHTML = `
-                                <a href="${ad.linkUrl}" target="_blank" rel="noopener">
+                                <a href="${ad.linkUrl}" target="_blank" rel="noopener noreferrer">
                                     <img src="${ad.imageUrl}" alt="${ad.title}">
                                 </a>
                             `;
@@ -784,7 +881,7 @@
                         const content = document.getElementById('rightAdContent');
                         if (content) {
                             content.innerHTML = `
-                                <a href="${ad.linkUrl}" target="_blank" rel="noopener">
+                                <a href="${ad.linkUrl}" target="_blank" rel="noopener noreferrer">
                                     <img src="${ad.imageUrl}" alt="${ad.title}">
                                 </a>
                             `;
